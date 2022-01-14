@@ -1,7 +1,11 @@
 package gotask
 
+import (
+	"context"
+)
+
 type Runner interface {
-	Run(job *Job) error
+	Run(ctx context.Context, job *Job) error
 }
 
 type Job struct {
