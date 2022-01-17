@@ -20,9 +20,12 @@ var ErrTaskRunOverMax = errors.New("task run over max")
 var ErrJobNotExists = errors.New("job not exists")
 
 type Task interface {
+	IsFree() bool
+	Job(ctx context.Context, key interface{}) *Job
+	IsRunning(key interface{}) bool
+	Runs() (i int)
 	AddRunner(runner Runner) (*Job, error)
 	StopJob(key interface{}) error
-	Runs() int
 }
 
 func Load(max int, done func(j *Job)) Task {
