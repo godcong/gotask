@@ -72,6 +72,16 @@ func (t *task) Runs() (i int) {
 	return
 }
 
+func (t *task) RunKeys() []interface{} {
+	var keys []interface{}
+	t.lock.RLock()
+	for key := range t.jobs {
+		keys = append(keys, key)
+	}
+	t.lock.RUnlock()
+	return keys
+}
+
 func (t *task) AddRunner(runner Runner) (*Job, error) {
 	if t.IsFree() {
 		return nil, ErrTaskRunOverMax
