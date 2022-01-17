@@ -87,7 +87,7 @@ func Test_task_AddRunner(t1 *testing.T) {
 					name: "runner4",
 				},
 			},
-			wantErr: false,
+			wantErr: true,
 		},
 		{
 			name:   "",
@@ -97,16 +97,16 @@ func Test_task_AddRunner(t1 *testing.T) {
 					name: "runner5",
 				},
 			},
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 	t := Load(3, func(j *Job) {
-		fmt.Println("done", j.Key())
+		fmt.Println("done", j)
 	})
 
 	for _, tt := range tests {
 		t1.Run(tt.name, func(t1 *testing.T) {
-			if err := t.AddRunner(tt.args.runner); (err != nil) != tt.wantErr {
+			if _, err := t.AddRunner(tt.args.runner); (err != nil) != tt.wantErr {
 				t1.Errorf("AddRunner() error = %v, wantErr %v", err, tt.wantErr)
 				t.StopJob(tt.args.runner.Key())
 			}
@@ -126,7 +126,7 @@ func (r runner) Run(ctx context.Context, job *Job) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		default:
-			fmt.Println(r.name, job.Key())
+			fmt.Println(r.name, job)
 		}
 	}
 }

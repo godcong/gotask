@@ -2,6 +2,7 @@ package gotask
 
 import (
 	"context"
+	"fmt"
 
 	"go.uber.org/atomic"
 )
@@ -53,11 +54,20 @@ func (j *Job) Err() error {
 	return j.err
 }
 
-func (j *Job) Key() interface{} {
+func (j *Job) Runner() Runner {
 	if j.r != nil {
-		return j.r.Key()
+		return j.r
 	}
 	return nil
+}
+
+func (j *Job) String() string {
+	key := ""
+	if j.r != nil {
+		key = fmt.Sprintf("%v", j.r.Key())
+	}
+
+	return "job:" + key
 }
 
 func runJob(job *Job, r Runner) (*Job, error) {
