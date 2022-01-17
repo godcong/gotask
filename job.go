@@ -41,6 +41,10 @@ func (j *Job) reset() {
 	j.err = nil
 }
 
+func (j *Job) IsRunning() bool {
+	return j.stopped.Load()
+}
+
 func (j *Job) Stop() {
 	j.stopped.Store(true)
 	if j.cancel != nil {
