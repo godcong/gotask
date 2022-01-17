@@ -72,7 +72,7 @@ func (t *task) Runs() (i int) {
 	return
 }
 
-func (t *task) RunKeys() []interface{} {
+func (t *task) RunJobs() []interface{} {
 	var keys []interface{}
 	t.lock.RLock()
 	for key := range t.jobs {
