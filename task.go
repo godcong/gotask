@@ -26,6 +26,7 @@ type Task interface {
 	Runs() (i int)
 	AddRunner(runner Runner) (*Job, error)
 	StopJob(key interface{}) error
+	GetRunning() []interface{}
 }
 
 func Load(max int, done func(j *Job)) Task {
@@ -72,7 +73,7 @@ func (t *task) Runs() (i int) {
 	return
 }
 
-func (t *task) RunJobs() []interface{} {
+func (t *task) GetRunning() []interface{} {
 	var keys []interface{}
 	t.lock.RLock()
 	for key := range t.jobs {
