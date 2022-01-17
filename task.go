@@ -2,6 +2,7 @@ package gotask
 
 import (
 	"container/list"
+	"context"
 	"errors"
 	"sync"
 )
@@ -42,6 +43,16 @@ func Load(max int, done func(j *Job)) Task {
 
 func (t *task) IsFree() bool {
 	return t.Runs() >= t.max
+}
+
+func (t *task) Job(ctx context.Context, key interface{}) *Job {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+	if job, ok := t.jobs[key]; ok {
+		t.ll.MoveToFront(job)
+		return job.Value.(*Job)
+	}
+	return nil
 }
 
 func (t *task) IsRunning(key interface{}) bool {
