@@ -53,18 +53,25 @@ func (j *Job) Err() error {
 	return j.err
 }
 
-func runJob(job *Job, r Runner) error {
+func (j *Job) Key() interface{} {
+	if j.r != nil {
+		return j.r.Key()
+	}
+	return nil
+}
+
+func runJob(job *Job, r Runner) (*Job, error) {
 	job.reset()
 	if r == nil {
 		job.done(ErrNoRunners)
-		return nil
+		return job, ErrNoRunners
 	}
 	job.r = r
 	go func() {
 		err := job.r.Run(job.ctx, job)
 		job.done(err)
 	}()
-	return nil
+	return job, nil
 }
 
 func stopJob(t *task, job *Job, hook func(j *Job)) {

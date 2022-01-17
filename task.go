@@ -16,9 +16,12 @@ type task struct {
 }
 
 var ErrTaskRunOverMax = errors.New("task run over max")
+var ErrJobNotExists = errors.New("job not exists")
 
 type Task interface {
-	AddRunner(runner Runner) error
+	AddRunner(runner Runner) (*Job, error)
+	StopJob(key interface{}) error
+	Runs() int
 }
 
 func Load(max int, done func(j *Job)) Task {
@@ -55,16 +58,27 @@ func (t *task) Runs() (i int) {
 	return
 }
 
-func (t *task) AddRunner(runner Runner) error {
+func (t *task) AddRunner(runner Runner) (*Job, error) {
 	if t.IsFree() {
-		return ErrTaskRunOverMax
+		return nil, ErrTaskRunOverMax
 	}
 	job, err := t.idleJob(runner)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	return runJob(job, runner)
+}
+
+func (t *task) StopJob(key interface{}) error {
+	t.lock.RLock()
+	ele, ok := t.jobs[key]
+	t.lock.RUnlock()
+	if !ok {
+		return ErrJobNotExists
+	}
+	stopJob(t, ele.Value.(*Job), nil)
+	return nil
 }
 
 func (t *task) idleJob(r Runner) (*Job, error) {
